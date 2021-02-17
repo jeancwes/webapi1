@@ -5,45 +5,45 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebApi1.Models
 {
-    public class RequiredNaturalPersonRg : ValidationAttribute
-    {
-        public string GetErrorMessage() => "Pessoa física deve possuir RG.";
+    // public class RequiredNaturalPersonRg : ValidationAttribute
+    // {
+    //     public string GetErrorMessage() => "Pessoa física deve possuir RG.";
 
-        protected override ValidationResult IsValid(object value,
-            ValidationContext validationContext)
-        {
-            var client = (Client)validationContext.ObjectInstance;
+    //     protected override ValidationResult IsValid(object value,
+    //         ValidationContext validationContext)
+    //     {
+    //         var client = (Client)validationContext.ObjectInstance;
             
-            if (
-                client.CpfCnpj.Length == 11 && 
-                (client.Rg == null || client.Rg.ToString() == "")
-            ) 
-            {
-                return new ValidationResult(GetErrorMessage());
-            }
-            return ValidationResult.Success;
-        }
-    }
+    //         if (
+    //             client.isNaturalPerson() && 
+    //             (client.Rg == null || client.Rg.ToString() == "")
+    //         ) 
+    //         {
+    //             return new ValidationResult(GetErrorMessage());
+    //         }
+    //         return ValidationResult.Success;
+    //     }
+    // }
 
-    public class RequiredNaturalPersonBornDate : ValidationAttribute
-    {
-        public string GetErrorMessage() => "Pessoa física deve possuir data de nascimento.";
+    // public class RequiredNaturalPersonBornDate : ValidationAttribute
+    // {
+    //     public string GetErrorMessage() => "Pessoa física deve possuir data de nascimento.";
 
-        protected override ValidationResult IsValid(object value,
-            ValidationContext validationContext)
-        {
-            var client = (Client)validationContext.ObjectInstance;
+    //     protected override ValidationResult IsValid(object value,
+    //         ValidationContext validationContext)
+    //     {
+    //         var client = (Client)validationContext.ObjectInstance;
 
-            if (
-                client.CpfCnpj.Length == 11 && 
-                client.BornDate.ToString() == "01/01/0001 00:00:00"
-            ) 
-            {
-                return new ValidationResult(GetErrorMessage());
-            }
-            return ValidationResult.Success;
-        }
-    }
+    //         if (
+    //             client.isNaturalPerson() && 
+    //             client.BornDate.ToString() == "01/01/0001 00:00:00"
+    //         ) 
+    //         {
+    //             return new ValidationResult(GetErrorMessage());
+    //         }
+    //         return ValidationResult.Success;
+    //     }
+    // }
 
     public class Client
     {
@@ -55,9 +55,9 @@ namespace WebApi1.Models
         [MinLength(11)]
         [MaxLength(14)]
         public string CpfCnpj { get; set; }
-        [RequiredNaturalPersonRg]
+        // [RequiredNaturalPersonRg]
         public string Rg { get; set; }
-        [RequiredNaturalPersonBornDate]
+        // [RequiredNaturalPersonBornDate]
         public DateTime BornDate { get; set; }
         [Required]
         [Phone]
@@ -71,6 +71,14 @@ namespace WebApi1.Models
 
         public bool isLegalPerson() {
             if (CpfCnpj.Length == 14)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool isNaturalPerson() {
+            if (CpfCnpj.Length == 11)
             {
                 return true;
             }
@@ -99,13 +107,26 @@ namespace WebApi1.Models
             return false;
         }
 
+        public bool isValidPlanPerson(Plan plan) 
+        {
+            if (isLegalPerson() && plan.PermitLegalPerson == true)
+            {
+                return true;
+            }
+            if (isNaturalPerson())
+            {
+                return true;
+            }
+            return false;
+        }
+
         public bool isValidRg() 
         {
             if (isLegalPerson() && Rg == "")
             {
                 return true;
             }
-            if (!isLegalPerson() && Rg != "")
+            if (isNaturalPerson() && Rg != "")
             {
                 return true;
             }

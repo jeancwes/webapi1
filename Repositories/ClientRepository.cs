@@ -72,6 +72,11 @@ namespace WebApi1.Repositories
                     throw new PlanEndEffectiveDateInvalidException("PlanEndEffectiveDateInvalidException");
                 }
 
+                if (!client.isValidPlanPerson(plan))
+                {
+                    throw new PlanPersonInvalidException("PlanPersonInvalidException");
+                }
+
                 plans.Add(
                     new ClientPlan
                     {
